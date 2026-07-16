@@ -1,0 +1,35 @@
+# Build folders
+Debug/
+Release/
+
+# STM32CubeIDE generated
+.settings/
+.metadata/
+
+# Eclipse
+.project
+.cproject
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+build.ninja
+.ninja*
+
+# Object files
+*.o
+*.obj
+*.d
+
+# Executables
+*.elf
+*.bin
+*.hex
+*.list
+
+# Temporary
+*.log
+
+# VS Code
+.vscode/
