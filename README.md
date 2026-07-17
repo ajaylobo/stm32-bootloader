@@ -4,13 +4,13 @@ A production-style STM32 bootloader developed from scratch on the STM32F446RE.
 
 ## Features
 
-- ✅ Independent Bootloader
-- ✅ Independent Application
-- ✅ Application Relocation (0x08010000)
-- ✅ Application Validation
-- ✅ Vector Table Relocation (VTOR)
-- ✅ Main Stack Pointer (MSP) Switching
-- ✅ Bootloader → Application Handoff
+- [x] Independent Bootloader
+- [x] Independent Application
+- [x] Application Relocation (0x08010000)
+- [x] Application Validation
+- [x] Vector Table Relocation (VTOR)
+- [x] Main Stack Pointer (MSP) Switching
+- [x] Bootloader → Application Handoff
 - [ ] UART Firmware Update
 - [ ] Flash Programming
 - [ ] CRC Verification
