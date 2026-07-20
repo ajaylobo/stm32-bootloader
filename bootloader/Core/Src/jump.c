@@ -23,22 +23,39 @@ void JumpToApplication(void)
 
 	__disable_irq();
 
-	/*Stop SysTick*/
+	/* Disable and clear NVIC interrupts */
+	for(uint32_t i=0; i<3; i++)
+
+	{
+		NVIC->ICER[i]=0xFFFFFFFF;
+		NVIC->ICPR[i]=0xFFFFFFFF;
+	}
+
+	/* reset, disable, and clear the SysTick */
 	SysTick->CTRL = 0;
 	SysTick->LOAD = 0;
-	SysTick->VAL = 0;
+	SysTick->VAL  = 0;
 
 	HAL_RCC_DeInit();
 	HAL_DeInit();
 
-	__set_MSP(app_msp);
-
+	/* Update vector table */
 	SCB->VTOR = APP_ADDRESS;
 
+	/* Ensure the write completed */
+	__DSB();
 
+	/* Flush pipeline */
+	__ISB();
+
+	/* Switch to application's stack */
+	__set_MSP(app_msp);
+
+	/* Re-enable interrupts */
 	__enable_irq();
-	app_entry();
 
+	/* Jump to application */
+	app_entry();
 
 
 }
