@@ -11,6 +11,7 @@ The goal of this project is not just to build a working bootloader, but to under
 - ✅ Independent Bootloader Project
 - ✅ Independent Application Project
 - ✅ Application Relocation
+- ✅ NVIC Cleanup
 - ✅ Vector Table Relocation (VTOR)
 - ✅ Main Stack Pointer (MSP) Switching
 - ✅ Application Validation
@@ -61,13 +62,13 @@ Stay    Application
 - [x] Application Project
 - [x] Linker Script Relocation
 - [x] Application Validation
+- [x] NVIC Cleanup
 - [x] MSP Switching
 - [x] VTOR Relocation
 - [x] Successful Application Jump
 
 ### Upcoming
 
-- [ ] NVIC Cleanup
 - [ ] Flash Driver
 - [ ] UART Driver
 - [ ] UART Firmware Update
