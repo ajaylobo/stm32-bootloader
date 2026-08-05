@@ -7,6 +7,7 @@
 
 
 #include "flash.h"
+#include "validation.h"
 #include "stm32f4xx.h"
 
 static Flash_Status_t Flash_CheckErrors(void);
@@ -70,7 +71,7 @@ Flash_Status_t Flash_WaitForReady(uint32_t timeout)
 }
 
 
-static Flash_Status_t Flash_CheckErrors()
+static Flash_Status_t Flash_CheckErrors(void)
 {
 	if((FLASH->SR & FLASH_SR_WRPERR) != 0U)
 	{
@@ -167,4 +168,85 @@ Flash_Status_t Flash_EraseSector(Flash_Sector_t sector)
 uint32_t Flash_GetTick(void)
 {
     return HAL_GetTick();
+}
+
+Flash_Status_t Flash_ProgramWord(uint32_t address, uint32_t data)
+{
+    Flash_Status_t status = FLASH_OK;
+    Flash_Status_t lock_status;
+
+    /*
+     * TODO:
+     * 1. Validate address range
+     * 2. Validate 4-byte alignment
+     * 3. Unlock Flash
+     * 4. Wait until ready
+     * 5. Clear previous status flags
+     * 6. Clear SER (safety)
+     * 7. Configure PSIZE = Word
+     * 8. Set PG
+     * 9. Program:
+     *      *(volatile uint32_t *)address = data;
+     * 10. Wait until ready
+     * 11. Clear PG
+     * 12. Lock Flash
+     * 13. Return status
+     */
+
+    if ((address < FLASH_START) || (address > FLASH_END))
+    	return FLASH_ERROR_FLASH_ADDRESS;
+
+    if((address & 0x3U) != 0U)
+    	return FLASH_ERROR_ALIGNMENT;
+
+    status = Flash_Unlock();
+	if(status != FLASH_OK)
+		return status;
+	
+	status = Flash_WaitForReady(FLASH_PROGRAM_TIMEOUT);
+	if(FLASH_OK != status)
+	{
+		goto cleanup;
+	}
+
+	/* clear SER for safety */
+	FLASH->CR &= ~FLASH_CR_SER;
+
+	/* configure PSIZE to 32bit word */
+	FLASH->CR &= ~FLASH_CR_PSIZE;
+	FLASH->CR |= FLASH_PSIZE_WORD;
+
+	/*  set PG bit */
+	FLASH->CR |= FLASH_CR_PG;
+
+	*(volatile uint32_t *)address = data;
+
+	status = Flash_WaitForReady(FLASH_PROGRAM_TIMEOUT);
+	if(FLASH_OK != status)
+	{
+		goto cleanup;
+	}
+
+
+	cleanup:
+	FLASH->CR &= ~FLASH_CR_PG;
+	lock_status = Flash_Lock();
+	if((status == FLASH_OK) &&
+	   (lock_status != FLASH_OK))
+	{
+		status = lock_status;
+	}
+
+	return status;
+
+}
+
+Flash_Status_t Flash_Verify(uint32_t address, uint32_t data)
+{
+	if (*(volatile uint32_t *)address == data)
+	{
+	    return FLASH_OK;
+	}
+
+	return FLASH_ERROR_VERIFY;
 }
