@@ -26,9 +26,48 @@ bool RingBuffer_IsFull(const RingBuffer_t *rb)
 }
 
 
+bool RingBuffer_Push(RingBuffer_t *rb, uint8_t byte)
+{
+	if(RingBuffer_IsFull(rb))
+	{
+		return false;
+	}
 
+	rb->buffer[rb->head] = byte;
 
-bool RingBuffer_Push(RingBuffer_t *rb, uint8_t byte);
-bool RingBuffer_Pop(RingBuffer_t *rb, uint8_t *byte);
+	rb->head++;
+
+	if(rb->head >= RING_BUFFER_SIZE)
+	{
+		rb->head = 0U;
+	}
+
+	rb->count++;
+
+	return true;
+
+}
+
+bool RingBuffer_Pop(RingBuffer_t *rb, uint8_t *byte)
+{
+	if(RingBuffer_IsEmpty(rb))
+	{
+		return false;
+	}
+
+	*byte = rb->buffer[rb->tail];
+
+	rb->tail++;
+
+	if(rb->tail >= RING_BUFFER_SIZE)
+	{
+		rb->tail = 0U;
+	}
+
+	rb->count--;
+
+	return true;
+}
+
 
 
