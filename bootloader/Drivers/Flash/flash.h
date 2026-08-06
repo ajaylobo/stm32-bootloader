@@ -12,7 +12,7 @@
 
 #define FLASH_PROGRAM_TIMEOUT   100U
 #define FLASH_ERASE_TIMEOUT     1000U
-#define FLASH_PSIZE_WORD        (0x2U << FLASH_CR_PSIZE_Pos)
+//#define FLASH_PSIZE_WORD        (0x2U << FLASH_CR_PSIZE_Pos)
 
 typedef enum {
 	FLASH_OK = 0,
