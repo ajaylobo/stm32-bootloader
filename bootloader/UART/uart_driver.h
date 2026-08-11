@@ -8,13 +8,16 @@
 #ifndef UART_UART_DRIVER_H_
 #define UART_UART_DRIVER_H_
 
+#include <stdint.h>
+#include <stdbool.h>
+
 void UART_Init(void);
 bool UART_ReadByte(uint8_t *byte);
 bool UART_WriteByte(uint8_t *byte);
 bool UART_WriteBuffer(const uint8_t *data, uint16_t length);
 void UART2_IRQHandler(void);
-
-static void UART_SetBaudRate(uint32_t pclk, uint32_t baudrate);
+bool UART_HasRxOverflow(void);
+void UART_ClearRxOverflow(void);
 
 
 #endif /* UART_UART_DRIVER_H_ */
