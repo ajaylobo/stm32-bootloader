@@ -44,7 +44,7 @@ void UART_Init(void)
 
     /* Configure USART */
     USART2->CR1 = USART_CR1_RE |
-                  USART_CR1_TE |
+                  USART_CR1_TE|
                   USART_CR1_RXNEIE;
 
     /* 1 stop bit, default configuration */
@@ -56,7 +56,7 @@ void UART_Init(void)
 
     /* Enable USART2 interrupt in NVIC */
     NVIC_EnableIRQ(USART2_IRQn);
-
+    
 
     /* Enable USART2 */
     USART2->CR1 |= USART_CR1_UE;
@@ -82,9 +82,9 @@ static void UART_SetBaudRate(uint32_t pclk, uint32_t baudrate)
     USART2->BRR = (mantissa << 4U) | fraction;
 }
 
-void UART2_IRQHandler(void)
+void USART2_IRQHandler(void)
 {
-	if((USART2->SR & USART_SR_NE) != 0U)
+	if ((USART2->SR & USART_SR_RXNE) != 0U)
 	{
 		uint8_t byte = (uint8_t)USART2->DR;
 		if(!RingBuffer_Push(&uart_rx_buffer, byte))

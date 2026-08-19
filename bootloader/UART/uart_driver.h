@@ -15,7 +15,7 @@ void UART_Init(void);
 bool UART_ReadByte(uint8_t *byte);
 bool UART_WriteByte(uint8_t *byte);
 bool UART_WriteBuffer(const uint8_t *data, uint16_t length);
-void UART2_IRQHandler(void);
+void USART2_IRQHandler(void);
 bool UART_HasRxOverflow(void);
 void UART_ClearRxOverflow(void);
 
