@@ -24,6 +24,7 @@
 #include "uart_driver.h"
 #include "test_ring_buffer.h"
 #include "boot_protocol.h"
+#include "flash_test.h"
 
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
@@ -41,12 +42,14 @@ int main(void)
 	BSP_LED_Init(LED2);
 //	RingBuffer_RunTests();
 
-	UART_Init();
+	flash_test();
 
-	while(1)
-	{
-		BootProtocol_Process();
-	}
+//	UART_Init();
+//
+//	while(1)
+//	{
+//		BootProtocol_Process();
+//	}
 
 //	RingBuffer_Init(&uart_rx_buffer);
 //	for(int i = 0; i < RING_BUFFER_SIZE-1; i++)
