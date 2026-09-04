@@ -11,10 +11,13 @@
 
 #include<stdint.h>
 #include "flash.h"
+#include "validation.h"
 
 #define BOOT_SOF	(0xAAU)
 #define BOOT_MAX_PAYLOAD_SIZE	(128U)
 #define BOOT_PROTOCOL_VERSION    (1U)
+#define APP_FLASH_SIZE (448UL * 1024UL)
+
 
 typedef enum {
 	BOOT_CMD_START_UPDATE = 0x01,
