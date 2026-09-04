@@ -10,10 +10,14 @@
 
 
 #include<stdint.h>
+#include "flash.h"
+#include "validation.h"
 
 #define BOOT_SOF	(0xAAU)
 #define BOOT_MAX_PAYLOAD_SIZE	(128U)
 #define BOOT_PROTOCOL_VERSION    (1U)
+#define APP_FLASH_SIZE (448UL * 1024UL)
+
 
 typedef enum {
 	BOOT_CMD_START_UPDATE = 0x01,
@@ -28,11 +32,11 @@ typedef enum {
 
 typedef struct {
 	uint8_t sof;
+	uint8_t protocol_version;
 	Boot_Command_t command;
 	uint16_t length;
 	uint8_t payload[BOOT_MAX_PAYLOAD_SIZE];
 	uint16_t crc;
-	uint8_t protocol_version;
 }Boot_Packet_t;
 
 typedef enum {
@@ -54,5 +58,19 @@ typedef struct {
 typedef struct {
 	Flash_Status_t error;
 }Boot_NackPayload_t;
+
+typedef enum{
+	BOOT_STATE_WAIT_SOF,
+	BOOT_STATE_WAIT_VERSION,
+	BOOT_STATE_WAIT_COMMAND,
+	BOOT_STATE_WAIT_LENGTH_LOW,
+	BOOT_STATE_WAIT_LENGTH_HIGH,
+	BOOT_STATE_WAIT_PAYLOAD,
+	BOOT_STATE_WAIT_CRC_LOW,
+	BOOT_STATE_WAIT_CRC_HIGH
+}BootParser_State_t;
+
+void BootProtocol_Process(void);
+uint16_t Calculate_CRC(uint16_t crc, uint8_t byte);
 
 #endif /* INC_BOOT_PROTOCOL_H_ */

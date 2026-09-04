@@ -17,101 +17,89 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <stdio.h>
 #include "main.h"
 #include "validation.h"
 #include "jump.h"
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
+#include "uart_driver.h"
+#include "test_ring_buffer.h"
+#include "boot_protocol.h"
 
-/* USER CODE END Includes */
-
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-
-/* USER CODE END PD */
-
-/* Private macro -------------------------------------------------------------*/
-
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
-/* Private variables ---------------------------------------------------------*/
-
-/* USER CODE BEGIN PV */
-
-/* USER CODE END PV */
-
-/* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-/* USER CODE BEGIN PFP */
 
-/* USER CODE END PFP */
+//static RingBuffer_t uart_rx_buffer;
 
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
+static volatile bool uart_rx_overflow;
 
-/* USER CODE END 0 */
 
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
 int main(void)
 {
-
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
-
-  /* MCU Configuration--------------------------------------------------------*/
-
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-
-
 	HAL_Init();
+	SystemClock_Config();
+	MX_GPIO_Init();
+	BSP_LED_Init(LED2);
+//	RingBuffer_RunTests();
 
-  /* USER CODE BEGIN Init */
+	UART_Init();
 
-  /* USER CODE END Init */
+	while(1)
+	{
+		BootProtocol_Process();
+	}
 
-  /* Configure the system clock */
-  SystemClock_Config();
+//	RingBuffer_Init(&uart_rx_buffer);
+//	for(int i = 0; i < RING_BUFFER_SIZE-1; i++)
+//	{
+//		RingBuffer_Push(&uart_rx_buffer, (uint8_t) i);
+//	}
+//
+//	 while (1)
+//	{
+//		 bool result;
+//
+//		 result = RingBuffer_Push(&uart_rx_buffer, 0xAA);
+//
+//		 if (!result)
+//		 {
+//		     uart_rx_overflow = true;
+//		 }
+//	}
 
-  /* USER CODE BEGIN SysInit */
 
-  /* USER CODE END SysInit */
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  /* USER CODE BEGIN 2 */
+//	uint16_t crc = 0xFFFF;
+//
+//	crc = Calculate_CRC(crc, 0x01);
+//	crc = Calculate_CRC(crc, 0x01);
+//	crc = Calculate_CRC(crc, 0x01);
+//	crc = Calculate_CRC(crc, 0x00);
+//	crc = Calculate_CRC(crc, 0x01);
+//
 
-  /* USER CODE END 2 */
+//	while (1)
+//	{
+//
+//		if (UART_ReadByte(&byte))
+//		{
+//			printf("byte vale %d", byte);
+//			fflush(stdout);
+//		}
+//	}
 
-  /* Initialize leds */
-  BSP_LED_Init(LED2);
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while(1)
-  {
-	  if(IsApplicationValid())
-	  {
-		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-		  HAL_Delay(2000);
-		  JumpToApplication();
-	  }
-
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-	  HAL_Delay(200);
-  }
-  /* USER CODE END 3 */
+//	while(1)
+//	  {
+	//	  if(IsApplicationValid())
+	//	  {
+	//		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+	//		  HAL_Delay(2000);
+	//		  JumpToApplication();
+	//	  }
+	//
+	//	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+	//	  HAL_Delay(200);
+//	  }
+//	  /* USER CODE END 3 */
 }
 
 /**

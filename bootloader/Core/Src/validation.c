@@ -4,8 +4,8 @@
 
 bool IsApplicationValid(void)
 {
-	uint32_t app_msp = *(uint32_t *) APP_ADDRESS;
-	uint32_t app_reset = *(uint32_t *) (APP_ADDRESS + 4);
+	uint32_t app_msp = *(uint32_t *) APP_ADDRESS_START;
+	uint32_t app_reset = *(uint32_t *) (APP_ADDRESS_START + 4);
 
 	if(app_msp == EMPTY_FLASH)
 		return false;
