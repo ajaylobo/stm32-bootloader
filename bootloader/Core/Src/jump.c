@@ -17,8 +17,8 @@ void JumpToApplication(void)
 {
 
 
-	uint32_t app_msp = *(uint32_t *) APP_ADDRESS;
-	uint32_t app_reset = *(uint32_t *) (APP_ADDRESS + 4);
+	uint32_t app_msp = *(uint32_t *) APP_ADDRESS_START;
+	uint32_t app_reset = *(uint32_t *) (APP_ADDRESS_START + 4);
 	pFunction app_entry = (pFunction)app_reset;
 
 	__disable_irq();
@@ -40,7 +40,7 @@ void JumpToApplication(void)
 	HAL_DeInit();
 
 	/* Update vector table */
-	SCB->VTOR = APP_ADDRESS;
+	SCB->VTOR = APP_ADDRESS_START;
 
 	/* Ensure the write completed */
 	__DSB();
