@@ -69,7 +69,7 @@ void BootProtocol_Process()
 		break;
 
 	case BOOT_STATE_WAIT_LENGTH_HIGH:
-		current_packet.length |= (byte << 8U);
+		current_packet.length |= ((uint16_t)byte << 8U);
 		current_crc = Calculate_CRC(current_crc, byte);
 		if(current_packet.length > BOOT_MAX_PAYLOAD_SIZE)
 		{
@@ -101,12 +101,33 @@ void BootProtocol_Process()
 		break;
 
 	case BOOT_STATE_WAIT_CRC_HIGH:
-		current_packet.crc |= (byte << 8U);
+		current_packet.crc |= ((uint16_t)byte << 8U);
 		parser_state = BOOT_STATE_WAIT_SOF;
 		if(current_crc != current_packet.crc)
 		{
 			//TODO: NACK response must be generated.
-			uint8_t data = 0x0;
+			return;
+		}
+		if(current_packet.command == BOOT_CMD_START_UPDATE)
+		{
+			if(current_packet.length != 4U)
+			{
+				//TODO: NACK invalid start_update length
+				return;
+			}
+
+			firmware_size = 0U;
+			for(uint8_t i = 0U; i < 4U; i++)
+			{
+				firmware_size |= ((uint32_t)current_packet.payload[i] << (i*8U));
+			}
+
+			if(firmware_size > APP_FLASH_SIZE)
+			{
+				//TODO: NACK FW is too large
+				return;
+			}
+			received_firmware_size = 0U;
 		}
 		break;
 
@@ -120,14 +141,14 @@ void BootProtocol_Process()
 uint16_t Calculate_CRC(uint16_t crc, uint8_t byte)
 {
 	uint8_t loop = 8U;
-	crc ^= (byte << 8U);
+	crc ^= ((uint16_t)byte << 8U);
 	while(loop)
 	{
 		bool MSB = (crc & 0x8000U) != 0U;
 		crc = crc << 1U;
 		if(MSB)
 		{
-			crc ^= 0x1021;
+			crc ^= 0x1021U;
 		}
 		loop--;
 	}
