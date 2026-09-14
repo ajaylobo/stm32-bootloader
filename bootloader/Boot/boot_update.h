@@ -12,11 +12,14 @@
 typedef enum {
 	BOOT_UPDATE_OK = 0,
 	BOOT_UPDATE_ERROR_INVALID_SIZE,
-	BOOT_UPDATE_ERROR_ERASE
+	BOOT_UPDATE_ERROR_ERASE,
+	BOOT_UPDATE_ERROR_SIZE_MISMATCH,
+	BOOT_UPDATE_ERROR_NOT_ACTIVE
 }BootUpdate_Status_t;
 
 
-BootUpdate_Status_t BootUpdate_Start(uint32_t firmware_size);
+BootUpdate_Status_t BootUpdate_Start(uint32_t new_firmware_size);
+BootUpdate_Status_t BootUpdate_Write(const uint8_t *data, uint16_t length);
 
 
 #endif /* BOOT_BOOT_UPDATE_H_ */

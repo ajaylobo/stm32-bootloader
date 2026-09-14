@@ -6,7 +6,6 @@
  */
 
 #include "boot_update.h"
-#include "boot_protocol.h"
 #include "flash.h"
 #include "validation.h"
 #include <stdbool.h>
