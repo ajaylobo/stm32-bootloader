@@ -8,14 +8,20 @@
 #include "boot_update.h"
 #include "boot_protocol.h"
 #include "flash.h"
+#include "validation.h"
+#include <stdbool.h>
+#include <stddef.h>
 
 static uint32_t firmware_size;
 static uint32_t received_firmware_size;
 static uint32_t current_flash_address;
+static bool update_active;
+static uint8_t pending_length;
+static uint8_t pending_buffer[4];
 
 BootUpdate_Status_t BootUpdate_Start(uint32_t new_firmware_size)
 {
-	if((firmware_size == 0U) || (firmware_size > APP_FLASH_SIZE))
+	if((new_firmware_size == 0U) || (new_firmware_size > APP_FLASH_SIZE))
 	{
 		update_active = false;
 		return BOOT_UPDATE_ERROR_INVALID_SIZE;
