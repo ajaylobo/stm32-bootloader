@@ -51,3 +51,29 @@ BootUpdate_Status_t BootUpdate_Start(uint32_t new_firmware_size)
 	return BOOT_UPDATE_OK;
 
 }
+
+BootUpdate_Status_t BootUpdate_Write(const uint8_t *data, uint16_t length)
+{
+	if(!update_active)
+	{
+		return BOOT_UPDATE_ERROR_NOT_ACTIVE;
+	}
+
+	if((data == NULL) || (length == 0))
+	{
+		return BOOT_UPDATE_ERROR_SIZE_MISMATCH;
+	}
+
+	if(received_firmware_size > firmware_size)
+	{
+		return BOOT_UPDATE_ERROR_SIZE_MISMATCH;
+	}
+
+	if((uint32_t)length > (firmware_size - received_firmware_size))
+	{
+		return BOOT_UPDATE_ERROR_SIZE_MISMATCH;
+	}
+
+
+
+}
