@@ -124,8 +124,28 @@ void BootProtocol_Process()
 			}
 
 			BootUpdate_Status_t status =  BootUpdate_Start(new_firmware_size);
-
 		}
+
+		else if(current_packet.command == BOOT_CMD_DATA)
+		{
+			BootUpdate_Status_t status =  BootUpdate_Write(current_packet.payload, current_packet.length);
+			if(status != BOOT_UPDATE_OK)
+			{
+				//TODO: return flash error
+			}
+		}
+
+		else if(current_packet.command == BOOT_CMD_END_UPDATE)
+		{
+			BootUpdate_Status_t status =  BootUpdate_End();
+			if(status != BOOT_UPDATE_OK)
+			{
+				//TODO: return flash error
+			}
+		}
+
+
+
 		break;
 
 	default:
