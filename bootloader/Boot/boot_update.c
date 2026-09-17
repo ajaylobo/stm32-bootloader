@@ -85,7 +85,76 @@ BootUpdate_Status_t BootUpdate_Write(const uint8_t *data, uint16_t length)
 	{
 		return BOOT_UPDATE_ERROR_SIZE_MISMATCH;
 	}
-
+	uint32_t word = 0U;
+	for(uint16_t i = 0; i < length; i++)
+	{
+		pending_buffer[pending_length] = *(data + i);
+		pending_length++;
+		if(pending_length == 4U)
+		{
+			for(uint8_t j = 0U; j<4U; j++)
+			{
+				word |= (uint32_t)pending_buffer[j] << (j * 8);
+			}
+			Flash_Status_t status =  Flash_ProgramWord(current_flash_address, word);
+			if(status != FLASH_OK)
+			{
+				update_active = false;
+				return BOOT_UPDATE_ERROR_PROGRAM;
+			}
+			current_flash_address += 4U;
+			pending_length = 0U;
+			word = 0U;
+		}
+	}
+	received_firmware_size += length;
+	return BOOT_UPDATE_OK;
 
 
 }
+
+BootUpdate_Status_t BootUpdate_End()
+{
+	if(!update_active)
+	{
+		return BOOT_UPDATE_ERROR_NOT_ACTIVE;
+	}
+
+	if(received_firmware_size != firmware_size)
+	{
+		return BOOT_UPDATE_ERROR_SIZE_MISMATCH;
+	}
+
+	uint32_t word = 0U;
+	if(pending_length != 0U)
+	{
+		for(uint8_t j = 0; j < pending_length; j++)
+		{
+			word |= (uint32_t)pending_buffer[j] << (j * 8);
+		}
+
+		for(uint8_t j = pending_length; j < 4U; j++)
+		{
+			word |= 0xFFU << (j * 8);
+		}
+		Flash_Status_t status =  Flash_ProgramWord(current_flash_address, word);
+		if(status != FLASH_OK)
+		{
+			update_active = false;
+			return BOOT_UPDATE_ERROR_PROGRAM;
+		}
+		current_flash_address += pending_length;
+		pending_length = 0U;
+		word = 0U;
+	}
+
+	bool ap_status = IsApplicationValid();
+	if(!ap_status)
+	{
+		return BOOT_UPDATE_ERROR_INVALID_APP;
+	}
+
+	update_active = false;
+	return BOOT_UPDATE_OK;
+}
+
