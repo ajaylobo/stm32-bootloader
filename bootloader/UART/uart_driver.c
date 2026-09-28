@@ -109,3 +109,34 @@ void UART_ClearRxOverflow(void)
 {
     uart_rx_overflow = false;
 }
+
+
+bool UART_WriteByte(uint8_t byte)
+{
+	while((USART2->SR & USART_SR_TXE) == 0U)
+	{
+		/* Wait till the transfer data register is empty */
+	}
+	USART2->DR = byte;
+	return true;
+}
+
+
+bool UART_WriteBuffer(const uint8_t *data, uint16_t length)
+{
+	bool status = false;
+	if((data == NULL) || (length == 0U))
+	{
+		return status;
+	}
+
+	for(uint16_t i = 0U; i < length; i++)
+	{
+		 status = UART_WriteByte(data[i]);
+		 if(status == false)
+		 {
+			 return status;
+		 }
+	}
+	return true;
+}

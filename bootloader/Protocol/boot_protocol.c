@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include "boot_protocol.h"
 #include "uart_driver.h"
+#include "boot_update.h"
 
 BootParser_State_t parser_state = BOOT_STATE_WAIT_SOF;
 Boot_Packet_t current_packet;
@@ -115,20 +116,36 @@ void BootProtocol_Process()
 				//TODO: NACK invalid start_update length
 				return;
 			}
+			uint32_t new_firmware_size = 0U;
 
-			firmware_size = 0U;
 			for(uint8_t i = 0U; i < 4U; i++)
 			{
-				firmware_size |= ((uint32_t)current_packet.payload[i] << (i*8U));
+				new_firmware_size |= ((uint32_t)current_packet.payload[i] << (i * 8U));
 			}
 
-			if(firmware_size > APP_FLASH_SIZE)
-			{
-				//TODO: NACK FW is too large
-				return;
-			}
-			received_firmware_size = 0U;
+			BootUpdate_Status_t status =  BootUpdate_Start(new_firmware_size);
 		}
+
+		else if(current_packet.command == BOOT_CMD_DATA)
+		{
+			BootUpdate_Status_t status =  BootUpdate_Write(current_packet.payload, current_packet.length);
+			if(status != BOOT_UPDATE_OK)
+			{
+				//TODO: return flash error
+			}
+		}
+
+		else if(current_packet.command == BOOT_CMD_END_UPDATE)
+		{
+			BootUpdate_Status_t status =  BootUpdate_End();
+			if(status != BOOT_UPDATE_OK)
+			{
+				//TODO: return flash error
+			}
+		}
+
+
+
 		break;
 
 	default:
