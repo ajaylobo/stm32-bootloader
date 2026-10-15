@@ -26,7 +26,9 @@ BootUpdate_Status_t BootUpdate_Start(uint32_t new_firmware_size)
 		return BOOT_UPDATE_ERROR_INVALID_SIZE;
 	}
 
-	Flash_Status_t status = Flash_EraseSector(FLASH_SECTOR_4);
+	Flash_Status_t status;
+
+	status = Flash_EraseSector(FLASH_SECTOR_4);
 	if(status != FLASH_OK)
 	{
 		update_active = false;
@@ -40,19 +42,19 @@ BootUpdate_Status_t BootUpdate_Start(uint32_t new_firmware_size)
 		return BOOT_UPDATE_ERROR_ERASE;
 	}
 
-	status = Flash_EraseSector(FLASH_SECTOR_6);
-	if(status != FLASH_OK)
-	{
-		update_active = false;
-		return BOOT_UPDATE_ERROR_ERASE;
-	}
+	// status = Flash_EraseSector(FLASH_SECTOR_6);
+	// if(status != FLASH_OK)
+	// {
+	// 	update_active = false;
+	// 	return BOOT_UPDATE_ERROR_ERASE;
+	// }
 
-	status = Flash_EraseSector(FLASH_SECTOR_7);
-	if(status != FLASH_OK)
-	{
-		update_active = false;
-		return BOOT_UPDATE_ERROR_ERASE;
-	}
+	// status = Flash_EraseSector(FLASH_SECTOR_7);
+	// if(status != FLASH_OK)
+	// {
+	// 	update_active = false;
+	// 	return BOOT_UPDATE_ERROR_ERASE;
+	// }
 
 	firmware_size = new_firmware_size;
 	received_firmware_size = 0U;
