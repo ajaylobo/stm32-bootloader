@@ -106,7 +106,7 @@ void BootProtocol_Process()
 		parser_state = BOOT_STATE_WAIT_SOF;
 		if(current_crc != current_packet.crc)
 		{
-			//TODO: NACK response must be generated.
+			BootProtocol_SendResponse(BOOT_CMD_NACK, current_packet.command, BOOT_PACKET_CRC_ERROR);
 			return;
 		}
 		if(current_packet.command == BOOT_CMD_START_UPDATE)
@@ -114,6 +114,7 @@ void BootProtocol_Process()
 			if(current_packet.length != 4U)
 			{
 				//TODO: NACK invalid start_update length
+
 				return;
 			}
 			uint32_t new_firmware_size = 0U;
