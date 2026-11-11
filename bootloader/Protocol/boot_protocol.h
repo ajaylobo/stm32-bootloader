@@ -72,7 +72,7 @@ typedef struct {
 }Boot_ResponsePayload_t;
 
 void BootProtocol_Process(void);
-void BootProtocol_SendResponse(Boot_Command_t res_command, Boot_Command_t org_command, uint8_t status);
+bool BootProtocol_SendResponse(Boot_Command_t res_command, Boot_Command_t org_command, uint8_t status);
 uint16_t Calculate_CRC(uint16_t crc, uint8_t byte);
 
 #endif /* INC_BOOT_PROTOCOL_H_ */

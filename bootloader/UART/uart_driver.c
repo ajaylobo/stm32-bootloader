@@ -138,5 +138,10 @@ bool UART_WriteBuffer(const uint8_t *data, uint16_t length)
 			 return status;
 		 }
 	}
+	while(!(USART2->SR & USART_SR_TC))
+	{
+		//Do nothing
+	}
+	USART2->SR &= ~USART_SR_TC;
 	return true;
 }

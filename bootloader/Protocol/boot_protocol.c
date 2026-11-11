@@ -172,7 +172,7 @@ void BootProtocol_Process()
 
 }
 
-void BootProtocol_SendResponse(Boot_Command_t res_command, Boot_Command_t org_command, uint8_t status)
+bool BootProtocol_SendResponse(Boot_Command_t res_command, Boot_Command_t org_command, uint8_t status)
 {
 	uint16_t crc = 0xFFFFU;
 	uint8_t response[9] = { BOOT_SOF, BOOT_PROTOCOL_VERSION, ((uint8_t) res_command),2U, 0U,
