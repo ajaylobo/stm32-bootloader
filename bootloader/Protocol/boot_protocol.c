@@ -106,7 +106,7 @@ void BootProtocol_Process()
 		parser_state = BOOT_STATE_WAIT_SOF;
 		if(current_crc != current_packet.crc)
 		{
-			//TODO: NACK response must be generated.
+			BootProtocol_SendResponse(BOOT_CMD_NACK, current_packet.command, BOOT_PACKET_CRC_ERROR);
 			return;
 		}
 		if(current_packet.command == BOOT_CMD_START_UPDATE)
@@ -114,6 +114,7 @@ void BootProtocol_Process()
 			if(current_packet.length != 4U)
 			{
 				//TODO: NACK invalid start_update length
+
 				return;
 			}
 			uint32_t new_firmware_size = 0U;
@@ -124,23 +125,39 @@ void BootProtocol_Process()
 			}
 
 			BootUpdate_Status_t status =  BootUpdate_Start(new_firmware_size);
+			if(status == BOOT_UPDATE_OK)
+			{
+				BootProtocol_SendResponse(BOOT_CMD_ACK, BOOT_CMD_START_UPDATE, status);
+			}
+			else
+			{
+				BootProtocol_SendResponse(BOOT_CMD_NACK, BOOT_CMD_START_UPDATE, status);
+			}
 		}
 
 		else if(current_packet.command == BOOT_CMD_DATA)
 		{
 			BootUpdate_Status_t status =  BootUpdate_Write(current_packet.payload, current_packet.length);
-			if(status != BOOT_UPDATE_OK)
+			if(status == BOOT_UPDATE_OK)
 			{
-				//TODO: return flash error
+				BootProtocol_SendResponse(BOOT_CMD_ACK, BOOT_CMD_DATA, status);
+			}
+			else
+			{
+				BootProtocol_SendResponse(BOOT_CMD_NACK, BOOT_CMD_DATA, status);
 			}
 		}
 
 		else if(current_packet.command == BOOT_CMD_END_UPDATE)
 		{
 			BootUpdate_Status_t status =  BootUpdate_End();
-			if(status != BOOT_UPDATE_OK)
+			if(status == BOOT_UPDATE_OK)
 			{
-				//TODO: return flash error
+				BootProtocol_SendResponse(BOOT_CMD_ACK, BOOT_CMD_END_UPDATE, status);
+			}
+			else
+			{
+				BootProtocol_SendResponse(BOOT_CMD_NACK, BOOT_CMD_END_UPDATE, status);
 			}
 		}
 
@@ -153,6 +170,21 @@ void BootProtocol_Process()
 
 	}
 
+}
+
+bool BootProtocol_SendResponse(Boot_Command_t res_command, Boot_Command_t org_command, uint8_t status)
+{
+	uint16_t crc = 0xFFFFU;
+	uint8_t response[9] = { BOOT_SOF, BOOT_PROTOCOL_VERSION, ((uint8_t) res_command),2U, 0U,
+			((uint8_t) org_command), status, 0U, 0U };
+	for(uint8_t i = 1; i < 7U; i++)
+	{
+		crc = Calculate_CRC(crc, response[i]);
+	}
+
+	response[7] = ((uint8_t) crc);
+	response[8] = ((uint8_t) (crc >> 8U));
+	UART_WriteBuffer(response, 9U);
 }
 
 uint16_t Calculate_CRC(uint16_t crc, uint8_t byte)

@@ -10,8 +10,7 @@
 
 
 #include<stdint.h>
-#include "flash.h"
-#include "validation.h"
+#include "boot_update.h"
 
 #define BOOT_SOF	(0xAAU)
 #define BOOT_MAX_PAYLOAD_SIZE	(128U)
@@ -55,9 +54,6 @@ typedef struct {
 	uint32_t hardware_id;
 }Boot_StartUpdatePayload_t;
 
-typedef struct {
-	Flash_Status_t error;
-}Boot_NackPayload_t;
 
 typedef enum{
 	BOOT_STATE_WAIT_SOF,
@@ -70,7 +66,13 @@ typedef enum{
 	BOOT_STATE_WAIT_CRC_HIGH
 }BootParser_State_t;
 
+typedef struct {
+	Boot_Command_t command;
+	BootUpdate_Status_t status;
+}Boot_ResponsePayload_t;
+
 void BootProtocol_Process(void);
+bool BootProtocol_SendResponse(Boot_Command_t res_command, Boot_Command_t org_command, uint8_t status);
 uint16_t Calculate_CRC(uint16_t crc, uint8_t byte);
 
 #endif /* INC_BOOT_PROTOCOL_H_ */
