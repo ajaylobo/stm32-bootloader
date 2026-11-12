@@ -25,6 +25,7 @@
 #include "test_ring_buffer.h"
 #include "boot_protocol.h"
 #include "flash_test.h"
+#include "flash.h"
 
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
@@ -40,69 +41,34 @@ int main(void)
 	SystemClock_Config();
 	MX_GPIO_Init();
 	BSP_LED_Init(LED2);
-//	RingBuffer_RunTests();
+	UART_Init();
 
-	flash_test();
+	uint32_t start_time = HAL_GetTick();
 
-//	UART_Init();
-//
-//	while(1)
-//	{
-//		BootProtocol_Process();
-//	}
+	while(!BootProtocol_IsUpdateRequested() && (HAL_GetTick() - start_time) < BOOTLOADER_TIMEOUT)
+	{
+		BootProtocol_Process();
+	}
 
-//	RingBuffer_Init(&uart_rx_buffer);
-//	for(int i = 0; i < RING_BUFFER_SIZE-1; i++)
-//	{
-//		RingBuffer_Push(&uart_rx_buffer, (uint8_t) i);
-//	}
-//
-//	 while (1)
-//	{
-//		 bool result;
-//
-//		 result = RingBuffer_Push(&uart_rx_buffer, 0xAA);
-//
-//		 if (!result)
-//		 {
-//		     uart_rx_overflow = true;
-//		 }
-//	}
+	while(BootProtocol_IsUpdateRequested())
+	{
+		BootProtocol_Process();
+	}
 
 
+	while(1)
+	  {
+		  if(IsApplicationValid())
+		  {
+			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+			  HAL_Delay(2000);
+			  JumpToApplication();
+		  }
 
-//	uint16_t crc = 0xFFFF;
-//
-//	crc = Calculate_CRC(crc, 0x01);
-//	crc = Calculate_CRC(crc, 0x01);
-//	crc = Calculate_CRC(crc, 0x01);
-//	crc = Calculate_CRC(crc, 0x00);
-//	crc = Calculate_CRC(crc, 0x01);
-//
-
-//	while (1)
-//	{
-//
-//		if (UART_ReadByte(&byte))
-//		{
-//			printf("byte vale %d", byte);
-//			fflush(stdout);
-//		}
-//	}
-
-//	while(1)
-//	  {
-	//	  if(IsApplicationValid())
-	//	  {
-	//		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-	//		  HAL_Delay(2000);
-	//		  JumpToApplication();
-	//	  }
-	//
-	//	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-	//	  HAL_Delay(200);
-//	  }
-//	  /* USER CODE END 3 */
+		  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+		  HAL_Delay(200);
+	  }
+	  /* USER CODE END 3 */
 }
 
 /**
