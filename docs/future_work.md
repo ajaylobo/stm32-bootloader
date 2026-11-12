@@ -1,33 +1,19 @@
 # Future Work
 
-The current implementation focuses on reliable application handoff.
+The current implementation supports application handoff and a basic UART firmware update path. The current updater is limited to a 192 KiB image and provides packet-level CRC only.
 
-Future milestones include:
+Potential future improvements:
 
-## Flash Driver
+## Firmware Validation and Metadata
 
-- Unlock Flash
-- Erase Sectors
-- Program Flash
-- Verify Flash
+- Add whole-image CRC verification.
+- Add firmware metadata, version and hardware compatibility checks.
 
-## UART Bootloader
+## Update Robustness
 
-- UART Driver
-- Packet Parser
-- ACK/NACK
-- Timeout Handling
-
-## Firmware Validation
-
-- CRC32
-- Metadata
-- Firmware Size
-- Version Number
-
-## Robustness
-
-- Rollback
-- Watchdog Recovery
-- Dual Image Support
-- Secure Boot
+- Add packet retries and recovery from interrupted transfers.
+- Add a timeout after an update starts.
+- Add rollback or dual-image support.
+- Consider watchdog recovery and authenticated/secure boot.
+- Extend the updater and linker layout together if support for firmware larger than 192 KiB is needed.
+- Consider YMODEM or another standard transfer protocol.

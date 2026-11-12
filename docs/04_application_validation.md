@@ -42,21 +42,23 @@ For STM32F446RE:
 
 The second word contains the Reset_Handler address.
 
-It must lie inside the application's flash region.
+The current implementation requires it to be at or above the application start and no higher than the MCU's physical flash end:
 
 ```
-0x08010000 <= Reset_Handler <= 0x08080000
+0x08010001 <= Reset_Handler <= 0x0807FFFF
 ```
+
+This upper bound is wider than the 192 KiB application region in the linker script. The check is a basic vector sanity check; it does not prove that the entire image is valid or that the reset handler lies within the bytes received during an update.
 
 ---
 
 ## Future Improvements
 
-Current implementation validates only the vector table.
+The current implementation checks only the initial MSP and Reset_Handler values. Update packet CRC and received-size checks do not replace whole-image validation.
 
 Future versions will additionally verify:
 
-- Firmware CRC
-- Firmware Version
-- Firmware Size
-- Digital Signature
+- Whole-image CRC
+- Firmware metadata and version
+- Hardware compatibility
+- Digital signature
