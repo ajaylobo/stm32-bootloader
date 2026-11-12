@@ -15,7 +15,9 @@
 #define BOOT_SOF	(0xAAU)
 #define BOOT_MAX_PAYLOAD_SIZE	(128U)
 #define BOOT_PROTOCOL_VERSION    (1U)
-#define APP_FLASH_SIZE (448UL * 1024UL)
+//#define APP_FLASH_SIZE (448UL * 1024UL)
+
+#define BOOTLOADER_TIMEOUT 3000U
 
 
 typedef enum {
@@ -74,5 +76,6 @@ typedef struct {
 void BootProtocol_Process(void);
 bool BootProtocol_SendResponse(Boot_Command_t res_command, Boot_Command_t org_command, uint8_t status);
 uint16_t Calculate_CRC(uint16_t crc, uint8_t byte);
+bool BootProtocol_IsUpdateRequested(void);
 
 #endif /* INC_BOOT_PROTOCOL_H_ */

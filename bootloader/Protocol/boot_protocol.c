@@ -9,11 +9,13 @@
 #include "boot_protocol.h"
 #include "uart_driver.h"
 #include "boot_update.h"
+#include "stm32f4xx_hal.h"
 
 BootParser_State_t parser_state = BOOT_STATE_WAIT_SOF;
 Boot_Packet_t current_packet;
 uint16_t payload_index = 0;
 uint16_t current_crc;
+static bool boot_update_requested = false;
 
 void BootProtocol_Process()
 {
@@ -128,6 +130,8 @@ void BootProtocol_Process()
 			if(status == BOOT_UPDATE_OK)
 			{
 				BootProtocol_SendResponse(BOOT_CMD_ACK, BOOT_CMD_START_UPDATE, status);
+				boot_update_requested = true;
+
 			}
 			else
 			{
@@ -153,7 +157,11 @@ void BootProtocol_Process()
 			BootUpdate_Status_t status =  BootUpdate_End();
 			if(status == BOOT_UPDATE_OK)
 			{
-				BootProtocol_SendResponse(BOOT_CMD_ACK, BOOT_CMD_END_UPDATE, status);
+				if(BootProtocol_SendResponse(BOOT_CMD_ACK, BOOT_CMD_END_UPDATE, status))
+				{
+					NVIC_SystemReset();
+				}
+
 			}
 			else
 			{
@@ -184,7 +192,7 @@ bool BootProtocol_SendResponse(Boot_Command_t res_command, Boot_Command_t org_co
 
 	response[7] = ((uint8_t) crc);
 	response[8] = ((uint8_t) (crc >> 8U));
-	UART_WriteBuffer(response, 9U);
+	return UART_WriteBuffer(response, 9U);
 }
 
 uint16_t Calculate_CRC(uint16_t crc, uint8_t byte)
@@ -204,7 +212,10 @@ uint16_t Calculate_CRC(uint16_t crc, uint8_t byte)
 	return crc;
 }
 
-
+bool BootProtocol_IsUpdateRequested()
+{
+	return boot_update_requested;
+}
 
 
 
