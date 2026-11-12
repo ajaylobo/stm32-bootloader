@@ -7,7 +7,7 @@ The STM32F446RE contains:
 - 512 KB Internal Flash
 - 128 KB SRAM
 
-The flash memory is divided into two independent regions.
+The current layout reserves the first 64 KB for the bootloader and uses the next 192 KB for the application. Although the MCU has more flash, the application linker script and updater currently stop at `0x08040000`.
 
 ```
 Flash Memory
@@ -23,8 +23,13 @@ Flash Memory
 ┌──────────────────────────────┐
 │                              │
 │        Application           │
-│          448 KB              │
+│          192 KB              │
 │                              │
+└──────────────────────────────┘
+0x08040000
+┌──────────────────────────────┐
+│ Not used by current updater  │
+│          256 KB              │
 └──────────────────────────────┘
 0x08080000
 ```
@@ -86,4 +91,7 @@ The linker script informs the linker where the application image should be place
 | Region | Start | Size |
 |---------|--------|------|
 | Bootloader | 0x08000000 | 64 KB |
-| Application | 0x08010000 | 448 KB |
+| Application image | 0x08010000 | 192 KB |
+| Remaining flash | 0x08040000 | 256 KB (not used by the current updater) |
+
+The updater erases sectors 4 and 5, which cover `0x08010000`–`0x0803FFFF`. The application linker script has the same 192 KB limit. Do not assume the remaining physical flash can hold an update without changing both the linker layout and erase logic.
